@@ -14,18 +14,20 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-//    private Stage mainStage;
+    private static Stage mainStage;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("/sample.fxml"));
-
+        Parent root = FXMLLoader.load(getClass().getResource("/patient_list.fxml"));
         primaryStage.setScene(new Scene(root));
         primaryStage.setTitle("Medical History");
-
         primaryStage.show();
+        mainStage = primaryStage;
     }
 
+    public static Stage getMainStage() {
+        return mainStage;
+    }
 
     public static void main(String[] args) {
         launch(args);

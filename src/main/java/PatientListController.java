@@ -1,10 +1,13 @@
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.util.BundleUtil;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -15,13 +18,14 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Patient;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
 
-public class Controller implements Initializable {
+public class PatientListController implements Initializable {
 
     public TextField filter_text_box;
     public TableView<PatientModel> mainTable;
@@ -76,6 +80,14 @@ public class Controller implements Initializable {
     }
 
     public void showDetails(ActionEvent actionEvent) {
+        //TODO getowanie zaznaczonego wiersza - pacjenta
+        Platform.runLater( () -> {
+            try {
+                Main.getMainStage().setScene(new Scene(FXMLLoader.load(getClass().getResource("./patient_details.fxml"))));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public void delete(ActionEvent actionEvent) {
