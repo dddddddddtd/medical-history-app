@@ -5,8 +5,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -56,10 +58,18 @@ public class Controller implements Initializable {
 
         System.out.println("Loaded " + fhirpatients.size() + " patients!");
 
+        ArrayList<PatientModel> tempPatients = new ArrayList<PatientModel>();
         for(int i=0; i<fhirpatients.size(); i++){
             Patient r4patient = (Patient) fhirpatients.get(i);
             System.out.println(r4patient.getName().get(0).getGivenAsSingleString());
+            tempPatients.add(new PatientModel(r4patient.getName().get(0).getGivenAsSingleString()));
         }
+        patients = FXCollections.observableArrayList(tempPatients);
+        TableColumn<PatientModel, String> namecol = (TableColumn<PatientModel, String>) mainTable.getColumns().get(1);
+
+        namecol.setCellValueFactory(new PropertyValueFactory<PatientModel, String>("name"));
+        System.out.println(patients.size());
+        mainTable.setItems(patients);
     }
 
     public void add(ActionEvent actionEvent) {
