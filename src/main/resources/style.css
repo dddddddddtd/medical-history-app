@@ -1,0 +1,21 @@
+.root {
+    -fx-background-color: #F5F5F5;
+}
+.button {
+    -fx-text-fill: #232323;
+    -fx-background-color: #0087BD;
+}
+.button:hover {
+    -fx-cursor: hand;
+    -fx-background-color: #0098CE;
+}
+.main-label {
+    -fx-font-size: 3.0em;
+    -fx-text-fill: #0087BD;
+}
+.exit-button {
+    -fx-background-color: #DD2222;
+}
+.exit-button:hover {
+    -fx-background-color: #FF0000;
+}
