@@ -1,6 +1,3 @@
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.util.BundleUtil;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,8 +11,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
-import org.hl7.fhir.instance.model.api.IBaseBundle;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
 
 import java.io.IOException;
@@ -36,9 +31,8 @@ public class PatientListController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        List<Patient> r4patients = HapiFhirHandler.getPatients();
+        List<Patient> r4patients = FhirHandler.getPatients();
         List<PatientModel> tempPatients = r4patients.stream().map(x -> new PatientModel(x)).collect(Collectors.toList());
-
 
         patients = FXCollections.observableArrayList(tempPatients);
         TableColumn<PatientModel, String> namecol = (TableColumn<PatientModel, String>) mainTable.getColumns().get(1);

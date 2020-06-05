@@ -6,11 +6,14 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class HapiFhirHandler {
+public class FhirHandler {
     private static FhirContext ctx = FhirContext.forR4();
     private static IGenericClient client = ctx.newRestfulGenericClient("http://localhost:8080/baseR4");
+    private static final List<String> resourceStrings = new ArrayList<String>(Arrays.asList("MedicalRequest", "Medication", "Observation"));
 
     public static List<Patient> getPatients() {
         List<IBaseResource> fhirpatients = new ArrayList<>();
@@ -37,7 +40,7 @@ public class HapiFhirHandler {
         return finalPatients;
     }
 
-    public static void getPatientEverything(Patient patient){
+    public static List<Resource> getPatientEverything(Patient patient) {
         try {
             Parameters outParams = client
                     .operation()
@@ -49,33 +52,21 @@ public class HapiFhirHandler {
 
             Bundle result = (Bundle) outParams.getParameterFirstRep().getResource();
 
+            List<Resource> resources = new ArrayList<>();
+
             while (result.getLink("next") != null) {
-                result.getEntry().forEach(e -> {
-                    Resource res = e.getResource();
-                    switch (res.getClass().getSimpleName()) {
-                        case "MedicationRequest": {
-                            MedicationRequest medReq = (MedicationRequest) res;
-                            System.out.println("MedicationRequest: " + medReq.getRequester().getDisplay());
-                            break;
-                        }
-                        case "Observation": {
-                            Observation obs = (Observation) res;
-                            System.out.println("Observation: "+obs.getCode().getText()+ " - "+obs.getValueQuantity().getValue());
-                            break;
-                        }
-                        case "Medication": {
-                            Medication med = (Medication) res;
-                            break;
-                        }
-                        default: {
-                            break;
-                        }
-                    }
-                });
+                for(Bundle.BundleEntryComponent e : result.getEntry()){
+                    resources.add(e.getResource());
+                }
                 result = client.loadPage().next(result).execute();
             }
+            System.out.println("przed: " + resources.size());
+            resources = resources.stream().filter(x -> resourceStrings.contains(x.getClass().getSimpleName())).collect(Collectors.toList());
+            System.out.println("po: " + resources.size());
+            return resources;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
     }
 }
