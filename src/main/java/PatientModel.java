@@ -1,8 +1,8 @@
 import org.hl7.fhir.r4.model.Patient;
 
 public class PatientModel {
-    Patient patient;
-    String name;
+    private Patient patient;
+    private String name;
 
     PatientModel(Patient patient) {
         this.patient = patient;
@@ -15,5 +15,13 @@ public class PatientModel {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Patient getPatient() {
+        return patient;
+    }
+
+    public void setPatient(Patient patient) {
+        this.patient = patient;
     }
 }

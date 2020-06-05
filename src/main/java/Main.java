@@ -2,6 +2,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 //import ca.uhn.fhir.context.FhirContext;
@@ -18,7 +19,10 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("/patient_list.fxml"));
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/patient_list.fxml"));
+        Parent root = loader.load();
+
         primaryStage.setScene(new Scene(root));
         primaryStage.setTitle("Medical History");
         primaryStage.show();
