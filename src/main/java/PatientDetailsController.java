@@ -39,8 +39,8 @@ public class PatientDetailsController implements Initializable {
         Patient r4patient = patient.getPatient();
         List<Resource> resources = FhirHandler.getPatientEverything(r4patient);
 
-        for (Resource res : resources){
-            switch (res.getClass().getSimpleName()){
+        for (Resource res : resources) {
+            switch (res.getClass().getSimpleName()) {
                 case "MedicationRequest":
                     medicationRequests.add((MedicationRequest) res);
                     break;
@@ -70,14 +70,18 @@ public class PatientDetailsController implements Initializable {
     public void printObs() {
         System.out.println(observations.size());
         Integer i = 0;
-        for ( Observation obs : observations){
-            try {
-                System.out.println(i+". Observation: " + obs.getCode().getText() + " - " + obs.getValueQuantity().getValue());
-            } catch (FHIRException e) {
-                try {
-                    System.out.println(i+". Observation: " + obs.getCode().getText() + " - " + obs.getValueCodeableConcept().getText());
-                } catch (FHIRException fhirException) {
-                    fhirException.printStackTrace();
+
+        for (Observation obs : observations) {
+            if (obs.hasValueQuantity())
+                System.out.println(i + ". Observation: " + obs.getCode().getText() + " - " + obs.getValueQuantity().getValue() + " " + obs.getValueQuantity().getUnit());
+            else if (obs.hasValueCodeableConcept())
+                System.out.println(i + ". Observation: " + obs.getCode().getText() + " - " + obs.getValueCodeableConcept().getText());
+            else if (obs.hasComponent()) {
+                System.out.println(i + ". Observation:");
+                int j = 0;
+                for (Observation.ObservationComponentComponent component : obs.getComponent()) {
+                    System.out.println(j + ". Component: " + component.getCode().getText() + " - " + component.getValueQuantity().getValue() + " " + component.getValueQuantity().getUnit());
+                    j++;
                 }
             }
             i++;
