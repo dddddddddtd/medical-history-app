@@ -14,8 +14,14 @@ public class FhirHandler {
     private static FhirContext ctx = FhirContext.forR4();
     private static IGenericClient client = ctx.newRestfulGenericClient("http://localhost:8080/baseR4");
     private static final List<String> resourceStrings = new ArrayList<String>(Arrays.asList("MedicalRequest", "Medication", "Observation"));
+    private static List<PatientModel> globalPatients = new ArrayList<PatientModel>();
+    private static Boolean hasPatients = false;
 
-    public static List<Patient> getPatients() {
+    public static List<PatientModel> getGlobalPatients() {
+        return globalPatients;
+    }
+
+    public static void getPatients() {
         List<IBaseResource> fhirpatients = new ArrayList<>();
 
         Bundle bundle = client
@@ -35,9 +41,10 @@ public class FhirHandler {
         }
 
         //cast IBaseResource to Patient
-        List<Patient> finalPatients = (List<Patient>) (List<?>) fhirpatients;
 
-        return finalPatients;
+        List<Patient> finalPatients = (List<Patient>) (List<?>) fhirpatients;
+        globalPatients = finalPatients.stream().map(x -> new PatientModel(x)).collect(Collectors.toList());
+        hasPatients = true;
     }
 
     public static List<Resource> getPatientEverything(Patient patient) {
@@ -55,7 +62,7 @@ public class FhirHandler {
             List<Resource> resources = new ArrayList<>();
 
             while (result.getLink("next") != null) {
-                for(Bundle.BundleEntryComponent e : result.getEntry()){
+                for (Bundle.BundleEntryComponent e : result.getEntry()) {
                     resources.add(e.getResource());
                 }
                 result = client.loadPage().next(result).execute();
@@ -68,5 +75,9 @@ public class FhirHandler {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static Boolean hasPatients() {
+        return hasPatients;
     }
 }
