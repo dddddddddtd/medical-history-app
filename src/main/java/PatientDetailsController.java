@@ -16,7 +16,6 @@ public class PatientDetailsController implements Initializable {
     private Main mainController;
     private PatientModel patient;
     private List<Observation> observations = new ArrayList<>();
-    private List<Medication> medications = new ArrayList<>();
     private List<MedicationRequest> medicationRequests = new ArrayList<>();
 
     @FXML
@@ -39,41 +38,35 @@ public class PatientDetailsController implements Initializable {
 
     public void setup() {
         patientText.setText(patient.getName());
-        Patient r4patient = patient.getPatient();
-        List<Resource> resources = FhirHandler.getPatientEverything(r4patient);
+        List<Resource> resources = FhirHandler.getPatientEverything(patient.getPatient());
 
         for (Resource res : resources) {
             switch (res.getClass().getSimpleName()) {
                 case "MedicationRequest":
                     medicationRequests.add((MedicationRequest) res);
                     break;
-                case "Medication":
-                    medications.add((Medication) res);
-                    break;
                 case "Observation":
                     observations.add((Observation) res);
                     break;
             }
         }
-        System.out.println("Medication Requests: " + medicationRequests.size());
-        System.out.println("Medications: " + medications.size());
-        System.out.println("Observations: " + observations.size());
     }
 
     public void printMedReq() {
-        System.out.println(medicationRequests.size());
-        medicationRequests.forEach(medReq -> System.out.println("MedicationRequest: " + medReq.getRequester().getDisplay()));
-    }
-
-    public void printMed() {
-        System.out.println(medications.size());
-//        medications.forEach(med -> System.out.println(med.));
+        Integer i = 0;
+        for (MedicationRequest medReq : medicationRequests) {
+            if (medReq.hasMedicationCodeableConcept())
+                System.out.println(i + ". Medication: " + medReq.getMedicationCodeableConcept().getText());
+            else if (medReq.hasMedicationReference())
+                //nie wiem co z tym zrobic w sumie
+                //z tych przykladowych co ladowalismy nie ma ani jednego przykladu medication, zeby przetestowac
+                System.out.println(i + ". Medication: " + "test");
+        }
+        i++;
     }
 
     public void printObs() {
-        System.out.println(observations.size());
         Integer i = 0;
-
         for (Observation obs : observations) {
             if (obs.hasValueQuantity())
                 System.out.println(i + ". Observation: " + obs.getCode().getText() + " - " + obs.getValueQuantity().getValue() + " " + obs.getValueQuantity().getUnit());
@@ -99,7 +92,7 @@ public class PatientDetailsController implements Initializable {
         mainController.loadPatientList();
     }
 
-    public void setMainController(Main mainController){
+    public void setMainController(Main mainController) {
         this.mainController = mainController;
     }
 }

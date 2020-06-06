@@ -25,7 +25,6 @@
               <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>
               <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -33,17 +32,12 @@
                <children>
                   <StackPane prefHeight="150.0" prefWidth="200.0">
                      <children>
-                        <Button fx:id="medReqButton" mnemonicParsing="false" onAction="#printMedReq" text="MedicationRequest" />
+                        <Button fx:id="obsButton" mnemonicParsing="false" onAction="#printObs" text="Observation" />
                      </children>
                   </StackPane>
                   <StackPane prefHeight="150.0" prefWidth="200.0" GridPane.columnIndex="1">
                      <children>
-                        <Button fx:id="medButton" mnemonicParsing="false" onAction="#printMed" text="Medication" />
-                     </children>
-                  </StackPane>
-                  <StackPane prefHeight="150.0" prefWidth="200.0" GridPane.columnIndex="2">
-                     <children>
-                        <Button fx:id="obsButton" mnemonicParsing="false" onAction="#printObs" text="Observation" />
+                        <Button fx:id="medReqButton" mnemonicParsing="false" onAction="#printMedReq" text="MedicationRequest" />
                      </children>
                   </StackPane>
                </children>

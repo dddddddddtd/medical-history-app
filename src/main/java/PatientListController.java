@@ -2,6 +2,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
@@ -29,18 +30,23 @@ public class PatientListController implements Initializable {
     private ObservableList<PatientModel> patients;
     private final ArrayList<PatientModel> filtered_patients = new ArrayList<PatientModel>();
 
+    @FXML
+    TableColumn<PatientModel, String> idColumn;
+
+    @FXML
+    TableColumn<PatientModel, String> nameColumn;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("PatientDetailsController initalized");
-        System.out.println("FhirHandler.hasPatients: "+FhirHandler.hasPatients());
+        System.out.println("FhirHandler.hasPatients: " + FhirHandler.hasPatients());
         if (!FhirHandler.hasPatients()) {
             FhirHandler.getPatients();
-            patients = FXCollections.observableArrayList(FhirHandler.getGlobalPatients());
-            TableColumn<PatientModel, String> nameColumn = (TableColumn<PatientModel, String>) mainTable.getColumns().get(1);
-            nameColumn.setCellValueFactory(new PropertyValueFactory<PatientModel, String>("name"));
-            mainTable.setItems(patients);
         }
+        patients = FXCollections.observableArrayList(FhirHandler.getGlobalPatients());
+        idColumn.setCellValueFactory(new PropertyValueFactory<PatientModel, String>("id"));
+        nameColumn.setCellValueFactory(new PropertyValueFactory<PatientModel, String>("name"));
+        mainTable.setItems(patients);
     }
 
     public void add(ActionEvent actionEvent) {

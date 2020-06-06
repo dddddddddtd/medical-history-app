@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class FhirHandler {
     private static FhirContext ctx = FhirContext.forR4();
     private static IGenericClient client = ctx.newRestfulGenericClient("http://localhost:8080/baseR4");
-    private static final List<String> resourceStrings = new ArrayList<String>(Arrays.asList("MedicalRequest", "Medication", "Observation"));
+    private static final List<String> resourceStrings = new ArrayList<String>(Arrays.asList("MedicationRequest", "Medication", "Observation"));
     private static List<PatientModel> globalPatients = new ArrayList<PatientModel>();
     private static Boolean hasPatients = false;
 
@@ -67,9 +67,7 @@ public class FhirHandler {
                 }
                 result = client.loadPage().next(result).execute();
             }
-            System.out.println("przed: " + resources.size());
             resources = resources.stream().filter(x -> resourceStrings.contains(x.getClass().getSimpleName())).collect(Collectors.toList());
-            System.out.println("po: " + resources.size());
             return resources;
         } catch (Exception e) {
             e.printStackTrace();
