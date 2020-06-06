@@ -5,6 +5,7 @@ import javafx.scene.text.Text;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.r4.model.*;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public class PatientDetailsController implements Initializable {
+    private Main mainController;
     private PatientModel patient;
     private List<Observation> observations = new ArrayList<>();
     private List<Medication> medications = new ArrayList<>();
@@ -29,9 +31,10 @@ public class PatientDetailsController implements Initializable {
     @FXML
     Button obsButton;
 
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        System.out.println("PatientDetailsController initalized");
     }
 
     public void setup() {
@@ -52,9 +55,9 @@ public class PatientDetailsController implements Initializable {
                     break;
             }
         }
-        System.out.println(medicationRequests.size());
-        System.out.println(medications.size());
-        System.out.println(observations.size());
+        System.out.println("Medication Requests: " + medicationRequests.size());
+        System.out.println("Medications: " + medications.size());
+        System.out.println("Observations: " + observations.size());
     }
 
     public void printMedReq() {
@@ -90,5 +93,13 @@ public class PatientDetailsController implements Initializable {
 
     public void setPatient(PatientModel patient) {
         this.patient = patient;
+    }
+
+    public void goBack() throws IOException {
+        mainController.loadPatientList();
+    }
+
+    public void setMainController(Main mainController){
+        this.mainController = mainController;
     }
 }

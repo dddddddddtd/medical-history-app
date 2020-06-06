@@ -49,6 +49,13 @@
                </children>
             </GridPane>
          </center>
+         <bottom>
+            <StackPane prefHeight="178.0" prefWidth="954.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Button fx:id="backButton" mnemonicParsing="false" onAction="#goBack" text="Back" />
+               </children>
+            </StackPane>
+         </bottom>
       </BorderPane>
    </children>
 </AnchorPane>

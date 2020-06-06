@@ -23,23 +23,24 @@ import java.util.stream.Collectors;
 
 public class PatientListController implements Initializable {
 
+    private Main mainController;
     public TextField filter_text_box;
     public TableView<PatientModel> mainTable;
     private ObservableList<PatientModel> patients;
     private final ArrayList<PatientModel> filtered_patients = new ArrayList<PatientModel>();
 
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
-        List<Patient> r4patients = FhirHandler.getPatients();
-        List<PatientModel> tempPatients = r4patients.stream().map(x -> new PatientModel(x)).collect(Collectors.toList());
-
-        patients = FXCollections.observableArrayList(tempPatients);
-        TableColumn<PatientModel, String> namecol = (TableColumn<PatientModel, String>) mainTable.getColumns().get(1);
-
-        namecol.setCellValueFactory(new PropertyValueFactory<PatientModel, String>("name"));
-        System.out.println(patients.size());
-        mainTable.setItems(patients);
+        System.out.println("PatientDetailsController initalized");
+        System.out.println("FhirHandler.hasPatients: "+FhirHandler.hasPatients());
+        if (!FhirHandler.hasPatients()) {
+            FhirHandler.getPatients();
+            patients = FXCollections.observableArrayList(FhirHandler.getGlobalPatients());
+            TableColumn<PatientModel, String> nameColumn = (TableColumn<PatientModel, String>) mainTable.getColumns().get(1);
+            nameColumn.setCellValueFactory(new PropertyValueFactory<PatientModel, String>("name"));
+            mainTable.setItems(patients);
+        }
     }
 
     public void add(ActionEvent actionEvent) {
@@ -56,6 +57,7 @@ public class PatientListController implements Initializable {
                 loader.<PatientDetailsController>getController();
 
         controller.setPatient(selectedPatient);
+        controller.setMainController(this.mainController);
         controller.setup();
 
         Platform.runLater(() -> {
@@ -79,5 +81,9 @@ public class PatientListController implements Initializable {
 
 
     public void exit(ActionEvent actionEvent) {
+    }
+
+    public void setMainController(Main mainController){
+        this.mainController = mainController;
     }
 }
