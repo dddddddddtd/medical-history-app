@@ -7,16 +7,14 @@ import org.hl7.fhir.r4.model.*;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class PatientDetailsController implements Initializable {
     private Main mainController;
     private PatientModel patient;
-    private List<Observation> observations = new ArrayList<>();
     private List<MedicationRequest> medicationRequests = new ArrayList<>();
+    Map<String, List<Observation>> observations;
 
     @FXML
     Text patientText;
@@ -40,16 +38,23 @@ public class PatientDetailsController implements Initializable {
         patientText.setText(patient.getName());
         List<Resource> resources = FhirHandler.getPatientEverything(patient.getPatient());
 
+        List<Observation> tempObservations = new ArrayList<>();
         for (Resource res : resources) {
             switch (res.getClass().getSimpleName()) {
                 case "MedicationRequest":
                     medicationRequests.add((MedicationRequest) res);
                     break;
                 case "Observation":
-                    observations.add((Observation) res);
+                    tempObservations.add((Observation) res);
                     break;
             }
         }
+        observations = tempObservations.stream()
+                .collect(Collectors.groupingBy((x -> x.getCode().getText())));
+
+        observations.get("Hemoglobin A1c/Hemoglobin.total in Blood").forEach(x->{
+            System.out.println(x.getValueQuantity().getValue()+" "+x.getValueQuantity().getUnit());
+        });
     }
 
     public void printMedReq() {
@@ -66,22 +71,27 @@ public class PatientDetailsController implements Initializable {
     }
 
     public void printObs() {
-        Integer i = 0;
-        for (Observation obs : observations) {
-            if (obs.hasValueQuantity())
-                System.out.println(i + ". Observation: " + obs.getCode().getText() + " - " + obs.getValueQuantity().getValue() + " " + obs.getValueQuantity().getUnit());
-            else if (obs.hasValueCodeableConcept())
-                System.out.println(i + ". Observation: " + obs.getCode().getText() + " - " + obs.getValueCodeableConcept().getText());
-            else if (obs.hasComponent()) {
-                System.out.println(i + ". Observation:");
-                int j = 0;
-                for (Observation.ObservationComponentComponent component : obs.getComponent()) {
-                    System.out.println(j + ". Component: " + component.getCode().getText() + " - " + component.getValueQuantity().getValue() + " " + component.getValueQuantity().getUnit());
-                    j++;
+
+        observations.keySet().forEach(x->{
+            System.out.println(x);
+            int i=1;
+            for (Observation obs : observations.get(x)) {
+                if (obs.hasValueQuantity())
+                    System.out.println(i + ". Observation: " + obs.getCode().getText() + " - " + obs.getValueQuantity().getValue() + " " + obs.getValueQuantity().getUnit());
+                else if (obs.hasValueCodeableConcept())
+                    System.out.println(i + ". Observation: " + obs.getCode().getText() + " - " + obs.getValueCodeableConcept().getText());
+                else if (obs.hasComponent()) {
+                    System.out.println(i + ". Observation:");
+                    int j = 0;
+                    for (Observation.ObservationComponentComponent component : obs.getComponent()) {
+                        System.out.println(j + ". Component: " + component.getCode().getText() + " - " + component.getValueQuantity().getValue() + " " + component.getValueQuantity().getUnit());
+                        j++;
+                    }
                 }
+                i++;
             }
-            i++;
-        }
+        });
+        Integer i = 0;
     }
 
     public void setPatient(PatientModel patient) {
