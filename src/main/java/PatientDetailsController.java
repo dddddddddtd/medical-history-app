@@ -1,9 +1,13 @@
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Tooltip;
 import javafx.scene.text.Text;
 import javafx.util.StringConverter;
@@ -39,6 +43,9 @@ public class PatientDetailsController implements Initializable {
     @FXML
     ScatterChart<Number, Number> chart;
 
+    @FXML
+    ChoiceBox chartChoice;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("PatientDetailsController initalized");
@@ -62,56 +69,58 @@ public class PatientDetailsController implements Initializable {
         observations = tempObservations.stream()
                 .collect(Collectors.groupingBy((x -> x.getCode().getText())));
 
-        observations.get("Body Weight").forEach(x -> {
-            System.out.println(x.getValueQuantity().getValue() + " " + x.getValueQuantity().getUnit());
-            System.out.println(x.getIssued());
-        });
+        chartChoice.setItems(FXCollections.observableArrayList(observations.keySet()));
+        chartChoice.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
+            @Override
+            public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+                chart.getData().clear();
 
+                XYChart.Series<Number, Number> series = new XYChart.Series<>();
 
-        XYChart.Series<Number, Number> series = new XYChart.Series<>();
+                for (Observation x : observations.get(newValue)) {
+                    if (x.hasValueQuantity()) {
+                        Number value = x.getValueQuantity().getValue();
+                        System.out.println(x.getIssued());
 
-        for (Observation x : observations.get("Body Weight")) {
-            if (x.hasValueQuantity()) {
-                Number value = x.getValueQuantity().getValue();
-                System.out.println(x.getIssued());
+                        series.getData().add(new XYChart.Data(x.getIssued().getTime(), value));
+                    }
+                }
 
-                series.getData().add(new XYChart.Data(x.getIssued().getTime(), value));
-            }
-        }
-
-        chart.getData().add(series);
-        for (XYChart.Series<Number, Number> s : chart.getData()) {
-            for (XYChart.Data<Number, Number> d : s.getData()) {
-                Tooltip tooltip = new Tooltip(d.getXValue().toString() + "\n" +
-                        "Value: " + d.getYValue());
-                Tooltip.install(d.getNode(), tooltip);
-                //Adding class on hover
+                chart.getData().add(series);
+                for (XYChart.Series<Number, Number> s : chart.getData()) {
+                    for (XYChart.Data<Number, Number> d : s.getData()) {
+                        Tooltip tooltip = new Tooltip(d.getXValue().toString() + "\n" +
+                                "Value: " + d.getYValue());
+                        Tooltip.install(d.getNode(), tooltip);
+                        //Adding class on hover
 //                d.getNode().setOnMouseEntered(event -> d.getNode().getStyleClass().add("onHover"));
 //                //Removing class on exit
 //                d.getNode().setOnMouseExited(event -> d.getNode().getStyleClass().remove("onHover"));
-            }
-        }
-        NumberAxis xAxis = (NumberAxis) chart.getXAxis();
-        xAxis.setTickLabelFormatter(new StringConverter<Number>() {
-            @Override
-            public String toString(Number object) {
-                DateFormat df = new SimpleDateFormat("dd/mm/yyyy");
-                return df.format(new Date(object.longValue()));
-            }
+                    }
+                }
+                NumberAxis xAxis = (NumberAxis) chart.getXAxis();
+                xAxis.setTickLabelFormatter(new StringConverter<Number>() {
+                    @Override
+                    public String toString(Number object) {
+                        DateFormat df = new SimpleDateFormat("dd/mm/yyyy");
+                        return df.format(new Date(object.longValue()));
+                    }
 
-            @Override
-            public Number fromString(String string) {
-                return null;
+                    @Override
+                    public Number fromString(String string) {
+                        return null;
+                    }
+                });
+
+                List<Long> xvalues = series.getData().stream().map(x -> x.getXValue().longValue()).collect(Collectors.toList());
+                xvalues.sort(null);
+                Long lowerbound = xvalues.get(0);
+                Long upperbound = xvalues.get(xvalues.size() - 1);
+                xAxis.setAutoRanging(false);
+                xAxis.setLowerBound(lowerbound);
+                xAxis.setUpperBound(upperbound);
             }
         });
-
-        List<Long> xvalues = series.getData().stream().map(x -> x.getXValue().longValue()).collect(Collectors.toList());
-        xvalues.sort(null);
-        Long lowerbound = xvalues.get(0);
-        Long upperbound = xvalues.get(xvalues.size() - 1);
-        xAxis.setAutoRanging(false);
-        xAxis.setLowerBound(lowerbound);
-        xAxis.setUpperBound(upperbound);
     }
 
     public void printMedReq() {

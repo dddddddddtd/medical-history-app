@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.chart.ScatterChart?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -54,14 +56,34 @@
             </GridPane>
          </bottom>
          <center>
-            <ScatterChart fx:id="chart" BorderPane.alignment="CENTER">
-              <xAxis>
-                <NumberAxis side="BOTTOM" />
-              </xAxis>
-              <yAxis>
-                <NumberAxis side="LEFT" />
-              </yAxis>
-            </ScatterChart>
+            <TabPane BorderPane.alignment="CENTER">
+               <tabs>
+                  <Tab text="Patient Details" />
+                  <Tab text="Charts">
+                    <content>
+                        <StackPane>
+                           <children>
+                              <BorderPane prefHeight="200.0" prefWidth="200.0">
+                                 <center>
+                                    <ScatterChart fx:id="chart" BorderPane.alignment="CENTER">
+                                      <xAxis>
+                                        <NumberAxis side="BOTTOM" />
+                                      </xAxis>
+                                      <yAxis>
+                                        <NumberAxis side="LEFT" />
+                                      </yAxis>
+                                    </ScatterChart>
+                                 </center>
+                                 <top>
+                                    <ChoiceBox fx:id="chartChoice" prefWidth="150.0" BorderPane.alignment="CENTER" />
+                                 </top>
+                              </BorderPane>
+                           </children>
+                        </StackPane>
+                    </content>
+                  </Tab>
+               </tabs>
+            </TabPane>
          </center>
       </BorderPane>
    </children>
