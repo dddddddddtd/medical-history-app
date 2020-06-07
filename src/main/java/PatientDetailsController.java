@@ -46,6 +46,40 @@ public class PatientDetailsController implements Initializable {
     @FXML
     ChoiceBox chartChoice;
 
+    @FXML
+    private Text idText;
+
+    @FXML
+    private Text nameText;
+
+    @FXML
+    private Text genderText;
+
+    @FXML
+    private Text birthdateText;
+
+    @FXML
+    private Text deceasedText;
+
+    @FXML
+    private Text addressText;
+
+    @FXML
+    private Text mbirthText;
+
+    @FXML
+    private Text contactText;
+
+    @FXML
+    private Text communicationText;
+
+    @FXML
+    private Text practitionerText;
+
+    @FXML
+    private Text orgText;
+
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("PatientDetailsController initalized");
@@ -53,6 +87,20 @@ public class PatientDetailsController implements Initializable {
 
     public void setup() {
         patientText.setText(patient.getName());
+        idText.setText(patient.getId());
+        nameText.setText(patient.getName());
+        genderText.setText(patient.getGender());
+        birthdateText.setText(patient.getBirthdate());
+        deceasedText.setText("?");
+        addressText.setText(patient.getAddress());
+        mbirthText.setText("?");
+        contactText.setText("?");
+        communicationText.setText("?");
+        practitionerText.setText("?");
+        orgText.setText("?");
+
+
+
         List<Resource> resources = FhirHandler.getPatientEverything(patient.getPatient());
 
         List<Observation> tempObservations = new ArrayList<>();
