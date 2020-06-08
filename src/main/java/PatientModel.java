@@ -1,6 +1,7 @@
 import javafx.fxml.FXML;
 import javafx.scene.text.Text;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Practitioner;
 
 public class PatientModel {
     private Patient patient;
@@ -61,6 +62,9 @@ public class PatientModel {
 //        this.deceased = patient.getDeceased().toString();
         this.address = patient.getAddressFirstRep().getCity(); //co tutaj?
 //        this.mbirth = patient.getMultipleBirth().toString();
+//        Practitioner practitioner = (Practitioner) patient.getGeneralPractitionerFirstRep().getResource();
+
+        this.practitioner= " ";
         this.contact = patient.getContactFirstRep().toString(); //co tutaj?
         this.communication = patient.getCommunicationFirstRep().toString();
         this.org = patient.getManagingOrganization().getDisplay();

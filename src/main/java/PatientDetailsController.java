@@ -96,7 +96,7 @@ public class PatientDetailsController implements Initializable {
         mbirthText.setText("?");
         contactText.setText("?");
         communicationText.setText("?");
-        practitionerText.setText("?");
+        practitionerText.setText(patient.getPractitioner());
         orgText.setText("?");
 
 
@@ -140,17 +140,13 @@ public class PatientDetailsController implements Initializable {
                         Tooltip tooltip = new Tooltip(d.getXValue().toString() + "\n" +
                                 "Value: " + d.getYValue());
                         Tooltip.install(d.getNode(), tooltip);
-                        //Adding class on hover
-//                d.getNode().setOnMouseEntered(event -> d.getNode().getStyleClass().add("onHover"));
-//                //Removing class on exit
-//                d.getNode().setOnMouseExited(event -> d.getNode().getStyleClass().remove("onHover"));
                     }
                 }
                 NumberAxis xAxis = (NumberAxis) chart.getXAxis();
                 xAxis.setTickLabelFormatter(new StringConverter<Number>() {
                     @Override
                     public String toString(Number object) {
-                        DateFormat df = new SimpleDateFormat("dd/mm/yyyy");
+                        DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
                         return df.format(new Date(object.longValue()));
                     }
 
