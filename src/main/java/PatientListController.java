@@ -51,20 +51,20 @@ public class PatientListController implements Initializable {
 
     public void showDetails(ActionEvent actionEvent) throws IOException {
         PatientModel selectedPatient = mainTable.getSelectionModel().getSelectedItem();
+        if (selectedPatient !=  null) {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/patient_details.fxml"));
+            Parent root = loader.load();
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/patient_details.fxml"));
-        Parent root = loader.load();
+            PatientDetailsController controller =
+                    loader.<PatientDetailsController>getController();
+            Platform.runLater(() -> {
+                Main.getMainStage().setScene(new Scene(root));
+            });
 
-        PatientDetailsController controller =
-                loader.<PatientDetailsController>getController();
-
-        controller.setPatient(selectedPatient);
-        controller.setMainController(this.mainController);
-        controller.setup();
-
-        Platform.runLater(() -> {
-            Main.getMainStage().setScene(new Scene(root));
-        });
+            controller.setPatient(selectedPatient);
+            controller.setMainController(this.mainController);
+            controller.setup();
+        }
     }
 
     public void filtering(KeyEvent onKeyReleased) {

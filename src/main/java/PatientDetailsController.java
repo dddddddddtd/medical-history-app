@@ -67,11 +67,6 @@ public class PatientDetailsController implements Initializable {
     @FXML
     private Text communicationText;
 
-    @FXML
-    private Text practitionerText;
-
-    @FXML
-    private Text orgText;
 
     @FXML
     private DatePicker startDate;
@@ -94,12 +89,7 @@ public class PatientDetailsController implements Initializable {
         deceasedText.setText("?");
         addressText.setText(patient.getAddress());
         mbirthText.setText("?");
-        contactText.setText("?");
         communicationText.setText("?");
-        practitionerText.setText(patient.getPractitioner());
-        orgText.setText("?");
-
-
 
         List<Resource> resources = FhirHandler.getPatientEverything(patient.getPatient());
 
