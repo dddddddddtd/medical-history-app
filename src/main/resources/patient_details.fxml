@@ -19,15 +19,12 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
+<?import javafx.scene.control.Label?>
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="620.0" prefWidth="954.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PatientDetailsController">
    <children>
       <BorderPane layoutX="51.0" layoutY="14.0" prefHeight="620.0" prefWidth="954.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
-            <Text fx:id="patientText" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" textAlignment="CENTER" BorderPane.alignment="CENTER">
-               <BorderPane.margin>
-                  <Insets bottom="30.0" top="30.0" />
-               </BorderPane.margin>
-            </Text>
+             <Label fx:id="patientText" alignment="CENTER" contentDisplay="CENTER" layoutY="25.0" prefHeight="17.0" prefWidth="954.0" styleClass="main-label" text="Patients" />
          </top>
          <bottom>
             <GridPane BorderPane.alignment="CENTER">

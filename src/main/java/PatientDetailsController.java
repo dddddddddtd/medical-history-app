@@ -8,7 +8,7 @@ import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.text.Text;
 import javafx.util.StringConverter;
@@ -18,9 +18,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,7 +28,7 @@ public class PatientDetailsController implements Initializable {
     Map<String, List<Observation>> observations;
 
     @FXML
-    Text patientText;
+    Label patientText;
 
     @FXML
     Button medReqButton;
@@ -78,12 +75,6 @@ public class PatientDetailsController implements Initializable {
     @FXML
     private Text orgText;
 
-    @FXML
-    private DatePicker startDate;
-
-    @FXML
-    private DatePicker endDate;
-
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -123,8 +114,6 @@ public class PatientDetailsController implements Initializable {
         observations = tempObservations.stream()
                 .collect(Collectors.groupingBy((x -> x.getCode().getText())));
 
-        NumberAxis xAxis = (NumberAxis) chart.getXAxis();
-
         chartChoice.setItems(FXCollections.observableArrayList(observations.keySet()));
         chartChoice.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
             @Override
@@ -136,7 +125,9 @@ public class PatientDetailsController implements Initializable {
                 for (Observation x : observations.get(newValue)) {
                     if (x.hasValueQuantity()) {
                         Number value = x.getValueQuantity().getValue();
-                        series.getData().add(new XYChart.Data(x.getIssued().getTime(), value, x));
+                        System.out.println(x.getIssued());
+
+                        series.getData().add(new XYChart.Data(x.getIssued().getTime(), value));
                     }
                 }
 
@@ -144,11 +135,11 @@ public class PatientDetailsController implements Initializable {
                 for (XYChart.Series<Number, Number> s : chart.getData()) {
                     for (XYChart.Data<Number, Number> d : s.getData()) {
                         Tooltip tooltip = new Tooltip(d.getXValue().toString() + "\n" +
-                                "Value: " + d.getYValue()+"\n"+((Observation) d.getExtraValue()).getIssued().toString());
+                                "Value: " + d.getYValue());
                         Tooltip.install(d.getNode(), tooltip);
                     }
                 }
-
+                NumberAxis xAxis = (NumberAxis) chart.getXAxis();
                 xAxis.setTickLabelFormatter(new StringConverter<Number>() {
                     @Override
                     public String toString(Number object) {
@@ -162,35 +153,14 @@ public class PatientDetailsController implements Initializable {
                     }
                 });
 
-                List<Long> xvalues = series.getData().stream().map(x -> x.getXValue().longValue()).collect(Collectors.toList());
-                xvalues.sort(null);
-
-                Calendar calendar = Calendar.getInstance();
-
-                calendar.setTimeInMillis(xvalues.get(0));
-                calendar.add(Calendar.MONTH, -1);
-                startDate.setValue(calendar.getTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-                Long lowerbound = calendar.getTimeInMillis();
-
-                calendar.setTimeInMillis(xvalues.get(xvalues.size()-1));
-                calendar.add(Calendar.MONTH, 1);
-                endDate.setValue(calendar.getTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-                Long upperbound = calendar.getTimeInMillis();
-
+                List<Long> xvalues = series.getData().stream().map(x -> x.getXValue().longValue()).sorted().collect(Collectors.toList());
+                Long lowerbound = xvalues.get(0);
+                Long upperbound = xvalues.get(xvalues.size() - 1);
                 xAxis.setAutoRanging(false);
                 xAxis.setLowerBound(lowerbound);
                 xAxis.setUpperBound(upperbound);
-                xAxis.setTickUnit((upperbound-lowerbound)/10);
             }
         });
-
-        startDate.valueProperty().addListener(((observable, oldValue, newValue) -> {
-            xAxis.setLowerBound(Date.from(newValue.atStartOfDay(ZoneId.systemDefault()).toInstant()).toInstant().toEpochMilli());
-        }));
-        endDate.valueProperty().addListener(((observable, oldValue, newValue) -> {
-            xAxis.setUpperBound(Date.from(newValue.atStartOfDay(ZoneId.systemDefault()).toInstant()).toInstant().toEpochMilli());
-        }));
-
     }
 
     public void printMedReq() {

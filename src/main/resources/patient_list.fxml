@@ -32,7 +32,7 @@
                <padding>
                   <Insets right="5.0" />
                </padding></Label>
-                <TextField fx:id="filter_text_box" onKeyReleased="#filtering" prefHeight="25.0" prefWidth="298.0" GridPane.columnIndex="2" />
+                <TextField fx:id="filter_text_box" onKeyReleased="#filtering" prefHeight="25.0" prefWidth="289.0" GridPane.columnIndex="2" />
                 <Button mnemonicParsing="false" onAction="#exit" prefHeight="28.0" prefWidth="141.0" styleClass="exit-button" text="Exit" GridPane.columnIndex="3" />
             </children>
         </GridPane>
