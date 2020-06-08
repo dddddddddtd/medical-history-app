@@ -11,19 +11,14 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Tooltip;
 import javafx.scene.text.Text;
 import javafx.util.StringConverter;
-import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.r4.model.*;
 
 import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.google.common.primitives.Longs.max;
-import static com.google.common.primitives.Longs.min;
 
 public class PatientDetailsController implements Initializable {
     private Main mainController;
@@ -44,7 +39,7 @@ public class PatientDetailsController implements Initializable {
     ScatterChart<Number, Number> chart;
 
     @FXML
-    ChoiceBox chartChoice;
+    ChoiceBox<String> chartChoice;
 
     @FXML
     private Text idText;
@@ -82,7 +77,7 @@ public class PatientDetailsController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println("PatientDetailsController initalized");
+        System.out.println("PatientDetailsController initialized");
     }
 
     public void setup() {
@@ -104,15 +99,16 @@ public class PatientDetailsController implements Initializable {
         List<Resource> resources = FhirHandler.getPatientEverything(patient.getPatient());
 
         List<Observation> tempObservations = new ArrayList<>();
-        for (Resource res : resources) {
-            switch (res.getClass().getSimpleName()) {
-                case "MedicationRequest":
-                    medicationRequests.add((MedicationRequest) res);
-                    break;
-                case "Observation":
-                    tempObservations.add((Observation) res);
-                    break;
-            }
+        if (resources != null) {
+            for (Resource res : resources)
+                switch (res.getClass().getSimpleName()) {
+                    case "MedicationRequest":
+                        medicationRequests.add((MedicationRequest) res);
+                        break;
+                    case "Observation":
+                        tempObservations.add((Observation) res);
+                        break;
+                }
         }
         observations = tempObservations.stream()
                 .collect(Collectors.groupingBy((x -> x.getCode().getText())));
@@ -156,8 +152,7 @@ public class PatientDetailsController implements Initializable {
                     }
                 });
 
-                List<Long> xvalues = series.getData().stream().map(x -> x.getXValue().longValue()).collect(Collectors.toList());
-                xvalues.sort(null);
+                List<Long> xvalues = series.getData().stream().map(x -> x.getXValue().longValue()).sorted().collect(Collectors.toList());
                 Long lowerbound = xvalues.get(0);
                 Long upperbound = xvalues.get(xvalues.size() - 1);
                 xAxis.setAutoRanging(false);
