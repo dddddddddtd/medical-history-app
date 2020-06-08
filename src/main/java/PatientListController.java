@@ -49,11 +49,7 @@ public class PatientListController implements Initializable {
         mainTable.setItems(patients);
     }
 
-    public void add(ActionEvent actionEvent) {
-    }
-
     public void showDetails(ActionEvent actionEvent) throws IOException {
-        //TODO getowanie zaznaczonego wiersza - pacjenta
         PatientModel selectedPatient = mainTable.getSelectionModel().getSelectedItem();
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/patient_details.fxml"));
@@ -71,10 +67,6 @@ public class PatientListController implements Initializable {
         });
     }
 
-    public void delete(ActionEvent actionEvent) {
-    }
-
-
     public void filtering(KeyEvent onKeyReleased) {
         filtered_patients.clear();
         for (PatientModel patient : patients) {
@@ -85,8 +77,8 @@ public class PatientListController implements Initializable {
         mainTable.setItems(FXCollections.observableArrayList(filtered_patients));
     }
 
-
     public void exit(ActionEvent actionEvent) {
+        Main.getMainStage().close();
     }
 
     public void setMainController(Main mainController){
