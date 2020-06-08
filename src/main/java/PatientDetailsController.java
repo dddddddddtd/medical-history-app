@@ -1,12 +1,14 @@
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
 import javafx.util.StringConverter;
 import org.hl7.fhir.r4.model.*;
@@ -23,6 +25,7 @@ public class PatientDetailsController implements Initializable {
     private Main mainController;
     private PatientModel patient;
     private List<MedicationRequest> medicationRequests = new ArrayList<>();
+    private ObservableList<EventModel> events;
     Map<String, List<Observation>> observations;
 
     @FXML
@@ -79,6 +82,21 @@ public class PatientDetailsController implements Initializable {
     @FXML
     private DatePicker endDate;
 
+    @FXML
+    private TableView<EventModel> eventTable;
+
+    @FXML
+    private TableColumn<EventModel, String> dateColumn;
+
+    @FXML
+    private TableColumn<EventModel, String> typeColumn;
+
+    @FXML
+    private TableColumn<EventModel, String> eventColumn;
+
+    @FXML
+    private TableColumn<EventModel, String> valueColumn;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -100,24 +118,32 @@ public class PatientDetailsController implements Initializable {
         orgText.setText("?");
 
 
-
         List<Resource> resources = FhirHandler.getPatientEverything(patient.getPatient());
-
+        List<EventModel> tempEvents = new ArrayList<>();
         List<Observation> tempObservations = new ArrayList<>();
         if (resources != null) {
             for (Resource res : resources)
                 switch (res.getClass().getSimpleName()) {
                     case "MedicationRequest":
-                        medicationRequests.add((MedicationRequest) res);
+                        MedicationRequest medicationRequest = (MedicationRequest) res;
+                        medicationRequests.add(medicationRequest);
+                        tempEvents.add(new EventModel(medicationRequest));
                         break;
                     case "Observation":
-                        tempObservations.add((Observation) res);
+                        Observation observation = (Observation) res;
+                        tempObservations.add(observation);
+                        if (observation.hasComponent()) {
+                            for (int i = 0; i < observation.getComponent().size(); i++) {
+                                tempEvents.add(new EventModel(observation, i));
+                            }
+                        } else
+                            tempEvents.add(new EventModel(observation));
                         break;
                 }
         }
+
         observations = tempObservations.stream()
                 .collect(Collectors.groupingBy((x -> x.getCode().getText())));
-
 
         NumberAxis xAxis = (NumberAxis) chart.getXAxis();
 
@@ -141,7 +167,7 @@ public class PatientDetailsController implements Initializable {
                 for (XYChart.Series<Number, Number> s : chart.getData()) {
                     for (XYChart.Data<Number, Number> d : s.getData()) {
                         Tooltip tooltip = new Tooltip(d.getXValue().toString() + "\n" +
-                                "Value: " + d.getYValue()+"\n"+((Observation) d.getExtraValue()).getIssued().toString());
+                                "Value: " + d.getYValue() + "\n" + ((Observation) d.getExtraValue()).getIssued().toString());
                         Tooltip.install(d.getNode(), tooltip);
                     }
                 }
@@ -169,7 +195,7 @@ public class PatientDetailsController implements Initializable {
                 startDate.setValue(calendar.getTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
                 Long lowerbound = calendar.getTimeInMillis();
 
-                calendar.setTimeInMillis(xvalues.get(xvalues.size()-1));
+                calendar.setTimeInMillis(xvalues.get(xvalues.size() - 1));
                 calendar.add(Calendar.MONTH, 1);
                 endDate.setValue(calendar.getTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
                 Long upperbound = calendar.getTimeInMillis();
@@ -177,55 +203,26 @@ public class PatientDetailsController implements Initializable {
                 xAxis.setAutoRanging(false);
                 xAxis.setLowerBound(lowerbound);
                 xAxis.setUpperBound(upperbound);
-                xAxis.setTickUnit((upperbound-lowerbound)/10);
+                xAxis.setTickUnit((upperbound - lowerbound) / 10);
             }
         });
 
         startDate.valueProperty().addListener(((observable, oldValue, newValue) -> {
             xAxis.setLowerBound(Date.from(newValue.atStartOfDay(ZoneId.systemDefault()).toInstant()).toInstant().toEpochMilli());
-            xAxis.setTickUnit((xAxis.getUpperBound()-xAxis.getLowerBound())/10);
+            xAxis.setTickUnit((xAxis.getUpperBound() - xAxis.getLowerBound()) / 10);
         }));
         endDate.valueProperty().addListener(((observable, oldValue, newValue) -> {
             xAxis.setUpperBound(Date.from(newValue.atStartOfDay(ZoneId.systemDefault()).toInstant()).toInstant().toEpochMilli());
-            xAxis.setTickUnit((xAxis.getUpperBound()-xAxis.getLowerBound())/10);
+            xAxis.setTickUnit((xAxis.getUpperBound() - xAxis.getLowerBound()) / 10);
         }));
-    }
 
-    public void printMedReq() {
-        Integer i = 0;
-        for (MedicationRequest medReq : medicationRequests) {
-            if (medReq.hasMedicationCodeableConcept())
-                System.out.println(i + ". Medication: " + medReq.getMedicationCodeableConcept().getText());
-            else if (medReq.hasMedicationReference())
-                //nie wiem co z tym zrobic w sumie
-                //z tych przykladowych co ladowalismy nie ma ani jednego przykladu medication, zeby przetestowac
-                System.out.println(i + ". Medication: " + "test");
-        }
-        i++;
-    }
+        dateColumn.setCellValueFactory(new PropertyValueFactory<EventModel, String>("date"));
+        typeColumn.setCellValueFactory(new PropertyValueFactory<EventModel, String>("type"));
+        eventColumn.setCellValueFactory(new PropertyValueFactory<EventModel, String>("event"));
+        valueColumn.setCellValueFactory(new PropertyValueFactory<EventModel, String>("value"));
 
-    public void printObs() {
-
-        observations.keySet().forEach(x -> {
-            System.out.println(x);
-            int i = 1;
-            for (Observation obs : observations.get(x)) {
-                if (obs.hasValueQuantity())
-                    System.out.println(i + ". Observation: " + obs.getCode().getText() + " - " + obs.getValueQuantity().getValue() + " " + obs.getValueQuantity().getUnit());
-                else if (obs.hasValueCodeableConcept())
-                    System.out.println(i + ". Observation: " + obs.getCode().getText() + " - " + obs.getValueCodeableConcept().getText());
-                else if (obs.hasComponent()) {
-                    System.out.println(i + ". Observation:");
-                    int j = 0;
-                    for (Observation.ObservationComponentComponent component : obs.getComponent()) {
-                        System.out.println(j + ". Component: " + component.getCode().getText() + " - " + component.getValueQuantity().getValue() + " " + component.getValueQuantity().getUnit());
-                        j++;
-                    }
-                }
-                i++;
-            }
-        });
-        Integer i = 0;
+        this.events = FXCollections.observableArrayList(tempEvents);
+        eventTable.setItems(events);
     }
 
     public void setPatient(PatientModel patient) {
