@@ -12,6 +12,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
 import javafx.util.StringConverter;
 import org.hl7.fhir.r4.model.*;
+import javafx.scene.input.KeyEvent;
 
 import java.io.IOException;
 import java.net.URL;
@@ -26,6 +27,7 @@ public class PatientDetailsController implements Initializable {
     private PatientModel patient;
     private List<MedicationRequest> medicationRequests = new ArrayList<>();
     private ObservableList<EventModel> events;
+    private final ArrayList<EventModel> filtered_events = new ArrayList<EventModel>();
     Map<String, List<Observation>> observations;
 
     @FXML
@@ -39,6 +41,9 @@ public class PatientDetailsController implements Initializable {
 
     @FXML
     private Text idText;
+
+    @FXML
+    private TextField filter_text_box;
 
     @FXML
     private Text nameText;
@@ -213,6 +218,16 @@ public class PatientDetailsController implements Initializable {
 
         this.events = FXCollections.observableArrayList(tempEvents);
         eventTable.setItems(events);
+    }
+
+    public void filtering(KeyEvent onKeyReleased) {
+        filtered_events.clear();
+        for (EventModel event : events) {
+            if (String.format("%s %s %s %s", event.getDate(), event.getType(), event.getEvent(), event.getValue()).toLowerCase().contains(filter_text_box.getText().toLowerCase())) {
+                filtered_events.add(event);
+            }
+        }
+        eventTable.setItems(FXCollections.observableArrayList(filtered_events));
     }
 
     public void setPatient(PatientModel patient) {
