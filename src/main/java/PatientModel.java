@@ -3,6 +3,9 @@ import javafx.scene.text.Text;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Practitioner;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 public class PatientModel {
     private final Patient patient;
     private final String id;
@@ -29,7 +32,7 @@ public class PatientModel {
         this.id = patient.getIdElement().getIdPart();
         this.name = patient.getName().get(0).getGivenAsSingleString() + " " + patient.getName().get(0).getFamily();
         this.gender = patient.getGender().getDisplay();
-        this.birthdate = patient.getBirthDate().toString();
+        this.birthdate = (new SimpleDateFormat("yyyy.MM.dd hh:mm")).format(patient.getBirthDate());
         this.city = patient.getAddressFirstRep().getCity();
         this.street = patient.getAddressFirstRep().getLine().get(0).toString();
         this.postalcode = patient.getAddressFirstRep().getPostalCode();
