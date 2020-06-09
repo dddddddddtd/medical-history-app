@@ -53,7 +53,7 @@ public class EventModel {
     }
 
     private String formatDate(Date date) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm dd.MM.yyyy");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd");
         return dateFormat.format(date);
     }
 

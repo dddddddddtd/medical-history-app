@@ -32,12 +32,6 @@ public class PatientDetailsController implements Initializable {
     Label patientText;
 
     @FXML
-    Button medReqButton;
-
-    @FXML
-    Button obsButton;
-
-    @FXML
     ScatterChart<Number, Number> chart;
 
     @FXML
@@ -55,14 +49,10 @@ public class PatientDetailsController implements Initializable {
     @FXML
     private Text birthdateText;
 
-    @FXML
-    private Text deceasedText;
 
     @FXML
     private Text addressText;
 
-    @FXML
-    private Text mbirthText;
 
     @FXML
     private Text contactText;
@@ -104,9 +94,7 @@ public class PatientDetailsController implements Initializable {
         nameText.setText(patient.getName());
         genderText.setText(patient.getGender());
         birthdateText.setText(patient.getBirthdate());
-        deceasedText.setText("?");
         addressText.setText(patient.getAddress());
-        mbirthText.setText("?");
         communicationText.setText("?");
 
         List<Resource> resources = FhirHandler.getPatientEverything(patient.getPatient());
