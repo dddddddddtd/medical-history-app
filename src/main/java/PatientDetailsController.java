@@ -126,7 +126,8 @@ public class PatientDetailsController implements Initializable {
 
         NumberAxis xAxis = (NumberAxis) chart.getXAxis();
 
-        chartChoice.setItems(FXCollections.observableArrayList(observations.keySet()));
+        Map<String, List<Observation>> filtered = observations.entrySet().stream().filter(a -> a.getValue().stream().anyMatch(l -> l.hasValueQuantity())).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+        chartChoice.setItems(FXCollections.observableArrayList(filtered.keySet()));
         chartChoice.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
             @Override
             public void changed(ObservableValue observable, Object oldValue, Object newValue) {
@@ -134,10 +135,9 @@ public class PatientDetailsController implements Initializable {
 
                 XYChart.Series<Number, Number> series = new XYChart.Series<>();
 
-                for (Observation x : observations.get(newValue)) {
+                for (Observation x : filtered.get(newValue)) {
                     if (x.hasValueQuantity()) {
                         Number value = x.getValueQuantity().getValue();
-
                         series.getData().add(new XYChart.Data(x.getIssued().getTime(), value, x));
                     }
                 }
@@ -145,8 +145,11 @@ public class PatientDetailsController implements Initializable {
                 chart.getData().add(series);
                 for (XYChart.Series<Number, Number> s : chart.getData()) {
                     for (XYChart.Data<Number, Number> d : s.getData()) {
-                        Tooltip tooltip = new Tooltip(d.getXValue().toString() + "\n" +
-                                "Value: " + d.getYValue() + "\n" + ((Observation) d.getExtraValue()).getIssued().toString());
+                        Observation observation = (Observation) d.getExtraValue();
+                        String tooltipText =
+                                "Date: " + observation.getIssued().toString() + "\n" +
+                                        "Value: " + d.getYValue() + " [" + observation.getValueQuantity().getUnit()+"]";
+                        Tooltip tooltip = new Tooltip(tooltipText);
                         Tooltip.install(d.getNode(), tooltip);
                     }
                 }
