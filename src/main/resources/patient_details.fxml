@@ -11,16 +11,19 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="620.0" prefWidth="954.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PatientDetailsController">   <children>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="620.0" prefWidth="954.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PatientDetailsController">   <children>
       <BorderPane layoutX="51.0" layoutY="14.0" prefHeight="620.0" prefWidth="954.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
              <Label fx:id="patientText" alignment="CENTER" contentDisplay="CENTER" layoutY="25.0" prefHeight="17.0" prefWidth="954.0" styleClass="main-label" text="Name" />
@@ -114,20 +117,45 @@
                     <content>
                         <StackPane>
                            <children>
-                              <TableView fx:id="eventTable" prefHeight="200.0" prefWidth="200.0">
-                                <columns>
-                                  <TableColumn fx:id="dateColumn" prefWidth="182.0" text="Date" />
-                                  <TableColumn fx:id="typeColumn" prefWidth="284.0" text="Type" />
-                                    <TableColumn fx:id="eventColumn" prefWidth="182.0" text="Event" />
-                                    <TableColumn fx:id="valueColumn" prefWidth="75.0" text="Value" />
-                                </columns>
-                                 <columnResizePolicy>
-                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                 </columnResizePolicy>
-                                 <StackPane.margin>
-                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                 </StackPane.margin>
-                              </TableView>
+                              <GridPane>
+                                <columnConstraints>
+                                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints maxHeight="50.0" minHeight="50.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <TableView fx:id="eventTable" prefHeight="368.0" prefWidth="934.0">
+                                      <columns>
+                                        <TableColumn fx:id="dateColumn" prefWidth="182.0" text="Date" />
+                                        <TableColumn fx:id="typeColumn" prefWidth="284.0" text="Type" />
+                                          <TableColumn fx:id="eventColumn" prefWidth="182.0" text="Event" />
+                                          <TableColumn fx:id="valueColumn" prefWidth="75.0" text="Value" />
+                                      </columns>
+                                       <columnResizePolicy>
+                                          <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                       </columnResizePolicy>
+                                    </TableView>
+                                    <HBox prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="1">
+                                       <children>
+                                          <Label text="Search:">
+                                             <HBox.margin>
+                                                <Insets bottom="20.0" left="10.0" right="10.0" top="20.0" />
+                                             </HBox.margin>
+                                             <font>
+                                                <Font size="16.0" />
+                                             </font>
+                                          </Label>
+                                          <TextField fx:id="filter_text_box" onKeyReleased="#filtering" maxWidth="400.0" minWidth="400.0">
+                                             <HBox.margin>
+                                                <Insets bottom="20.0" left="10.0" right="10.0" top="20.0" />
+                                             </HBox.margin>
+                                          </TextField>
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </GridPane>
                            </children>
                         </StackPane>
                     </content>
