@@ -49,16 +49,20 @@ public class PatientDetailsController implements Initializable {
     @FXML
     private Text birthdateText;
 
+    @FXML
+    private Text phoneNumberText;
 
     @FXML
-    private Text addressText;
-
-
-    @FXML
-    private Text contactText;
+    private Text countryText;
 
     @FXML
-    private Text communicationText;
+    private Text cityText;
+
+    @FXML
+    private Text streetText;
+
+    @FXML
+    private Text postalCodeText;
 
 
     @FXML
@@ -94,8 +98,11 @@ public class PatientDetailsController implements Initializable {
         nameText.setText(patient.getName());
         genderText.setText(patient.getGender());
         birthdateText.setText(patient.getBirthdate());
-        addressText.setText(patient.getAddress());
-        communicationText.setText("?");
+        countryText.setText(patient.getCountry());
+        cityText.setText(patient.getCity());
+        streetText.setText(patient.getStreet());
+        postalCodeText.setText(patient.getPostalcode());
+        phoneNumberText.setText(patient.getPhonenumber());
 
         List<Resource> resources = FhirHandler.getPatientEverything(patient.getPatient());
         List<EventModel> tempEvents = new ArrayList<>();
@@ -127,7 +134,7 @@ public class PatientDetailsController implements Initializable {
         NumberAxis xAxis = (NumberAxis) chart.getXAxis();
 
         Map<String, List<Observation>> filtered = observations.entrySet().stream().filter(a -> a.getValue().stream().anyMatch(l -> l.hasValueQuantity())).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
-        chartChoice.setItems(FXCollections.observableArrayList(filtered.keySet()));
+        chartChoice.setItems(FXCollections.observableArrayList(filtered.keySet()).sorted());
         chartChoice.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
             @Override
             public void changed(ObservableValue observable, Object oldValue, Object newValue) {
@@ -154,6 +161,7 @@ public class PatientDetailsController implements Initializable {
                     }
                 }
 
+                chart.getYAxis().setLabel(filtered.get(newValue).get(0).getValueQuantity().getUnit());
                 xAxis.setTickLabelFormatter(new StringConverter<Number>() {
                     @Override
                     public String toString(Number object) {

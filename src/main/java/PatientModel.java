@@ -4,16 +4,17 @@ import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Practitioner;
 
 public class PatientModel {
-    private Patient patient;
-    private String id;
-    private String name;
-    private String gender;
-    private String birthdate;
-    private String address;
-    private String contact;
-    private String communication;
-    private String practitioner;
-    private String org;
+    private final Patient patient;
+    private final String id;
+    private final String name;
+    private final String gender;
+    private final String birthdate;
+    private final String phonenumber;
+    private final String postalcode;
+    private final String country;
+
+    private final String city;
+    private final String street;
 
     public String getGender() {
         return gender;
@@ -23,64 +24,48 @@ public class PatientModel {
         return birthdate;
     }
 
-
-    public String getAddress() {
-        return address;
-    }
-
-
-    public String getContact() {
-        return contact;
-    }
-
-    public String getCommunication() {
-        return communication;
-    }
-
-    public String getPractitioner() {
-        return practitioner;
-    }
-
-    public String getOrg() {
-        return org;
-    }
-
     PatientModel(Patient patient) {
         this.patient = patient;
         this.id = patient.getIdElement().getIdPart();
         this.name = patient.getName().get(0).getGivenAsSingleString() + " " + patient.getName().get(0).getFamily();
         this.gender = patient.getGender().getDisplay();
         this.birthdate = patient.getBirthDate().toString();
-        this.address = patient.getAddressFirstRep().getCity(); //co tutaj?
-//        Practitioner practitioner = (Practitioner) patient.getGeneralPractitionerFirstRep().getResource();
-
-        this.practitioner= " ";
-        this.contact = patient.getContactFirstRep().toString(); //co tutaj?
-        this.communication = patient.getCommunicationFirstRep().toString();
-        this.org = patient.getManagingOrganization().getDisplay();
+        this.city = patient.getAddressFirstRep().getCity();
+        this.street = patient.getAddressFirstRep().getLine().get(0).toString();
+        this.postalcode = patient.getAddressFirstRep().getPostalCode();
+        this.country = patient.getAddressFirstRep().getCountry();
+        this.phonenumber = patient.getTelecomFirstRep().getValue();
     }
 
     public Patient getPatient() {
         return patient;
     }
 
-    public void setPatient(Patient patient) {
-        this.patient = patient;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public String getPhonenumber() {
+        return phonenumber;
+    }
+
+    public String getPostalcode() {
+        return postalcode;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getStreet() {
+        return street;
     }
 }
