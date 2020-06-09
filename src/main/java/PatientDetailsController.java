@@ -153,9 +153,10 @@ public class PatientDetailsController implements Initializable {
                 for (XYChart.Series<Number, Number> s : chart.getData()) {
                     for (XYChart.Data<Number, Number> d : s.getData()) {
                         Observation observation = (Observation) d.getExtraValue();
-                        String tooltipText =
-                                "Date: " + observation.getIssued().toString() + "\n" +
-                                        "Value: " + d.getYValue() + " [" + observation.getValueQuantity().getUnit()+"]";
+//                        String tooltipText =
+//                                "Date: " + observation.getIssued().toString() + "\n" +
+//                                        "Value: " + d.getYValue() + " [" + observation.getValueQuantity().getUnit() + "]";
+                        String tooltipText = generateTooltipString(observation);
                         Tooltip tooltip = new Tooltip(tooltipText);
                         Tooltip.install(d.getNode(), tooltip);
                     }
@@ -225,5 +226,23 @@ public class PatientDetailsController implements Initializable {
 
     public void setMainController(Main mainController) {
         this.mainController = mainController;
+    }
+
+    public String generateTooltipString(Observation observation) {
+        String result = "";
+
+        if (observation.hasInterpretation())
+            result += observation.getInterpretationFirstRep().getText();
+        if (observation.hasCategory())
+            result += "\n"+"Category: "+ observation.getCategoryFirstRep().getCodingFirstRep().getDisplay();
+        if (observation.hasReferenceRange())
+            result += "\n"+"Ref Range: "+observation.getReferenceRangeFirstRep().getText();
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd hh:mm");
+
+        result += "\n" + "Date: " + dateFormat.format(observation.getIssued());
+        result += "\n" + "Value: " + observation.getValueQuantity().getValue() + " [" + observation.getValueQuantity().getUnit() + "]";
+
+        return result.trim();
     }
 }
