@@ -2,6 +2,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -12,6 +13,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import org.hl7.fhir.r4.model.*;
 
 import java.io.IOException;
@@ -51,7 +53,7 @@ public class PatientListController implements Initializable {
 
     public void showDetails(ActionEvent actionEvent) throws IOException {
         PatientModel selectedPatient = mainTable.getSelectionModel().getSelectedItem();
-        if (selectedPatient !=  null) {
+        if (selectedPatient != null) {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/patient_details.fxml"));
             Parent root = loader.load();
 
@@ -81,7 +83,7 @@ public class PatientListController implements Initializable {
         Main.getMainStage().close();
     }
 
-    public void setMainController(Main mainController){
+    public void setMainController(Main mainController) {
         this.mainController = mainController;
     }
 }

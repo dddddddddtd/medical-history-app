@@ -2,14 +2,20 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.hl7.fhir.r4.model.*;
 import javafx.scene.input.KeyEvent;
@@ -216,6 +222,29 @@ public class PatientDetailsController implements Initializable {
         eventColumn.setCellValueFactory(new PropertyValueFactory<EventModel, String>("event"));
         valueColumn.setCellValueFactory(new PropertyValueFactory<EventModel, String>("value"));
 
+        eventTable.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if(event.getClickCount()==2){
+                    try {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("./event_edit.fxml"));
+                        Parent root = loader.load();
+
+                        EventEditController controller =
+                                loader.<EventEditController>getController();
+                        controller.setup(eventTable.getSelectionModel().getSelectedItem());
+
+                        Stage stage = new Stage();
+                        stage.setTitle("Event Editor");
+                        stage.setScene(new Scene(root, 600, 400));
+                        stage.show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
         this.events = FXCollections.observableArrayList(tempEvents);
         eventTable.setItems(events);
     }
@@ -223,7 +252,7 @@ public class PatientDetailsController implements Initializable {
     public void filtering(KeyEvent onKeyReleased) {
         filtered_events.clear();
         for (EventModel event : events) {
-            if (String.format("%s %s %s %s", event.getDate(), event.getType(), event.getEvent(), event.getValue()).toLowerCase().contains(filter_text_box.getText().toLowerCase())) {
+            if (String.format("%s %s %s %s", event.getDate(), event.getType(), event.getEvent(), event.getValueunit()).toLowerCase().contains(filter_text_box.getText().toLowerCase())) {
                 filtered_events.add(event);
             }
         }

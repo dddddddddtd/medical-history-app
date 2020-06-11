@@ -2,9 +2,7 @@ import org.hl7.fhir.r4.model.Medication;
 import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Resource;
-import sun.java2d.pipe.SpanShapeRenderer;
 
-import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -13,7 +11,9 @@ public class EventModel {
     private String date;
     private String type;
     private String event;
+    private String valueunit;
     private String value;
+    private String unit;
 
     EventModel(MedicationRequest medicationRequest) {
         this.resource = medicationRequest;
@@ -28,16 +28,27 @@ public class EventModel {
 
     }
 
+    public String getValue() {
+        return value;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
     EventModel(Observation observation) {
         this.resource = observation;
         this.date = formatDate(observation.getIssued());
         this.type = "Observation";
         this.event = observation.getCode().getText();
 
-        if (observation.hasValueQuantity())
-            this.value = observation.getValueQuantity().getValue() + " " + observation.getValueQuantity().getUnit();
-        else if (observation.hasValueCodeableConcept())
-            this.value = observation.getValueCodeableConcept().getText();
+        if (observation.hasValueQuantity()) {
+//            this.valueunit = observation.getValueQuantity().getValue() + " " + observation.getValueQuantity().getUnit();
+            this.value = observation.getValueQuantity().getValue().toString();
+            this.unit = observation.getValueQuantity().getUnit();
+            this.valueunit=this.value+" "+this.unit;
+        } else if (observation.hasValueCodeableConcept())
+            this.valueunit = observation.getValueCodeableConcept().getText();
     }
 
     EventModel(Observation observation, Integer number) {
@@ -49,7 +60,7 @@ public class EventModel {
 
         Observation.ObservationComponentComponent component = observation.getComponent().get(number);
         this.event = component.getCode().getText();
-        this.value = component.getValueQuantity().getValue() + " " + component.getValueQuantity().getUnit();
+        this.valueunit = component.getValueQuantity().getValue() + " " + component.getValueQuantity().getUnit();
     }
 
     private String formatDate(Date date) {
@@ -69,8 +80,8 @@ public class EventModel {
         return event;
     }
 
-    public String getValue() {
-        return value;
+    public String getValueunit() {
+        return valueunit;
     }
 }
 
