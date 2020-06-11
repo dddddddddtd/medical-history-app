@@ -236,7 +236,7 @@ public class PatientDetailsController implements Initializable {
 
                         Stage stage = new Stage();
                         stage.setTitle("Event Editor");
-                        stage.setScene(new Scene(root, 600, 400));
+                        stage.setScene(new Scene(root, 400, 200));
                         stage.show();
                     } catch (IOException e) {
                         e.printStackTrace();
