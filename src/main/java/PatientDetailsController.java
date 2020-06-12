@@ -224,7 +224,7 @@ public class PatientDetailsController implements Initializable {
         eventTable.setRowFactory( tv -> {
             TableRow<EventModel> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
                     EventModel rowData = row.getItem();
                     if(rowData.getType().matches("Observation")){
                         try {
