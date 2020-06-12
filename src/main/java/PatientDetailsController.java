@@ -222,28 +222,57 @@ public class PatientDetailsController implements Initializable {
         eventColumn.setCellValueFactory(new PropertyValueFactory<EventModel, String>("event"));
         valueColumn.setCellValueFactory(new PropertyValueFactory<EventModel, String>("value"));
 
-        eventTable.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if(event.getClickCount()==2){
-                    try {
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("./event_edit.fxml"));
-                        Parent root = loader.load();
+        eventTable.setRowFactory( tv -> {
+            TableRow<EventModel> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    EventModel rowData = row.getItem();
+                    if(rowData.getType().matches("Observation")){
+                        try {
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("./event_edit.fxml"));
+                            Parent root = loader.load();
 
-                        EventEditController controller =
-                                loader.<EventEditController>getController();
-                        controller.setup(eventTable.getSelectionModel().getSelectedItem());
+                            EventEditController controller =
+                                    loader.<EventEditController>getController();
+                            controller.setEventModel(rowData);
+                            controller.setPatientDetailsController(getPatientDetailsController());
 
-                        Stage stage = new Stage();
-                        stage.setTitle("Event Editor");
-                        stage.setScene(new Scene(root, 400, 200));
-                        stage.show();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                            Stage stage = new Stage();
+                            stage.setTitle("Event Editor");
+                            stage.setScene(new Scene(root, 400, 200));
+                            stage.show();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
-            }
+            });
+            return row;
         });
+
+//        eventTable.setOnMouseClicked(new EventHandler<MouseEvent>() {
+//            @Override
+//            public void handle(MouseEvent event) {
+//                if(event.getClickCount()==2){
+//                    try {
+//                        FXMLLoader loader = new FXMLLoader(getClass().getResource("./event_edit.fxml"));
+//                        Parent root = loader.load();
+//
+//                        EventEditController controller =
+//                                loader.<EventEditController>getController();
+//                        controller.setEventModel(eventTable.getSelectionModel().getSelectedItem());
+//                        controller.setPatientDetailsController(getPatientDetailsController());
+//
+//                        Stage stage = new Stage();
+//                        stage.setTitle("Event Editor");
+//                        stage.setScene(new Scene(root, 400, 200));
+//                        stage.show();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        });
 
         this.events = FXCollections.observableArrayList(tempEvents);
         eventTable.setItems(events);
@@ -259,6 +288,10 @@ public class PatientDetailsController implements Initializable {
         eventTable.setItems(FXCollections.observableArrayList(filtered_events));
     }
 
+    public void refresh(){
+        eventTable.refresh();
+    }
+
     public void setPatient(PatientModel patient) {
         this.patient = patient;
     }
@@ -269,5 +302,9 @@ public class PatientDetailsController implements Initializable {
 
     public void setMainController(Main mainController) {
         this.mainController = mainController;
+    }
+
+    public PatientDetailsController getPatientDetailsController(){
+        return this;
     }
 }

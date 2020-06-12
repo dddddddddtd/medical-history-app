@@ -28,6 +28,18 @@ public class EventModel {
 
     }
 
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public Resource getResource() {
+        return resource;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
     public String getValue() {
         return value;
     }
@@ -43,7 +55,6 @@ public class EventModel {
         this.event = observation.getCode().getText();
 
         if (observation.hasValueQuantity()) {
-//            this.valueunit = observation.getValueQuantity().getValue() + " " + observation.getValueQuantity().getUnit();
             this.value = observation.getValueQuantity().getValue().toString();
             this.unit = observation.getValueQuantity().getUnit();
             this.valueunit=this.value+" "+this.unit;

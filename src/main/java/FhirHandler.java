@@ -75,6 +75,10 @@ public class FhirHandler {
         return null;
     }
 
+    public static void updateObservation(Observation observation){
+        client.update().resource(observation).execute();
+    }
+
     public static Boolean hasPatients() {
         return hasPatients;
     }
