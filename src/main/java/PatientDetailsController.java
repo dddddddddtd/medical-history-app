@@ -15,6 +15,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.hl7.fhir.r4.model.*;
@@ -237,7 +238,8 @@ public class PatientDetailsController implements Initializable {
                         Stage stage = new Stage();
                         stage.setTitle("Event Editor");
                         stage.setScene(new Scene(root, 400, 200));
-                        stage.show();
+                        stage.initModality(Modality.APPLICATION_MODAL);
+                        stage.showAndWait();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
