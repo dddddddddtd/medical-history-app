@@ -32,10 +32,9 @@ import java.util.stream.Collectors;
 public class PatientDetailsController implements Initializable {
     private Main mainController;
     private PatientModel patient;
-    private List<MedicationRequest> medicationRequests = new ArrayList<>();
     private ObservableList<EventModel> events;
     private final ArrayList<EventModel> filtered_events = new ArrayList<EventModel>();
-    Map<String, List<Observation>> observations;
+    private List<Observation> observations;
 
     @FXML
     Label patientText;
@@ -118,18 +117,17 @@ public class PatientDetailsController implements Initializable {
 
         List<Resource> resources = FhirHandler.getPatientEverything(patient.getPatient());
         List<EventModel> tempEvents = new ArrayList<>();
-        List<Observation> tempObservations = new ArrayList<>();
+        observations = new ArrayList<>();
         if (resources != null) {
             for (Resource res : resources)
                 switch (res.getClass().getSimpleName()) {
                     case "MedicationRequest":
                         MedicationRequest medicationRequest = (MedicationRequest) res;
-                        medicationRequests.add(medicationRequest);
                         tempEvents.add(new EventModel(medicationRequest));
                         break;
                     case "Observation":
                         Observation observation = (Observation) res;
-                        tempObservations.add(observation);
+                        observations.add(observation);
                         if (observation.hasComponent()) {
                             for (int i = 0; i < observation.getComponent().size(); i++) {
                                 tempEvents.add(new EventModel(observation, i));
@@ -140,13 +138,11 @@ public class PatientDetailsController implements Initializable {
                 }
         }
 
-        observations = tempObservations.stream()
-                .collect(Collectors.groupingBy((x -> x.getCode().getText())));
-
         NumberAxis xAxis = (NumberAxis) chart.getXAxis();
 
-        Map<String, List<Observation>> filtered = observations.entrySet().stream().filter(a -> a.getValue().stream().anyMatch(l -> l.hasValueQuantity())).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
-        chartChoice.setItems(FXCollections.observableArrayList(filtered.keySet()).sorted());
+        List<String> choices = observations.stream().filter(a -> a.hasValueQuantity()).map(x->x.getCode().getText()).distinct().sorted().collect(Collectors.toList());
+
+        chartChoice.setItems(FXCollections.observableArrayList(choices));
         chartChoice.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
             @Override
             public void changed(ObservableValue observable, Object oldValue, Object newValue) {
@@ -154,7 +150,9 @@ public class PatientDetailsController implements Initializable {
 
                 XYChart.Series<Number, Number> series = new XYChart.Series<>();
 
-                for (Observation x : filtered.get(newValue)) {
+                List<Observation> chartObservations = observations.stream().filter(x->x.getCode().getText().equals(String.valueOf(newValue))).collect(Collectors.toList());
+
+                for (Observation x : chartObservations) {
                     if (x.hasValueQuantity()) {
                         Number value = x.getValueQuantity().getValue();
                         series.getData().add(new XYChart.Data(x.getIssued().getTime(), value, x));
@@ -173,7 +171,7 @@ public class PatientDetailsController implements Initializable {
                     }
                 }
 
-                chart.getYAxis().setLabel(filtered.get(newValue).get(0).getValueQuantity().getUnit());
+                chart.getYAxis().setLabel(chartObservations.get(0).getValueQuantity().getUnit());
                 xAxis.setTickLabelFormatter(new StringConverter<Number>() {
                     @Override
                     public String toString(Number object) {
@@ -221,7 +219,7 @@ public class PatientDetailsController implements Initializable {
         dateColumn.setCellValueFactory(new PropertyValueFactory<EventModel, String>("date"));
         typeColumn.setCellValueFactory(new PropertyValueFactory<EventModel, String>("type"));
         eventColumn.setCellValueFactory(new PropertyValueFactory<EventModel, String>("event"));
-        valueColumn.setCellValueFactory(new PropertyValueFactory<EventModel, String>("value"));
+        valueColumn.setCellValueFactory(new PropertyValueFactory<EventModel, String>("valueunit"));
 
         eventTable.setRowFactory( tv -> {
             TableRow<EventModel> row = new TableRow<>();
@@ -243,7 +241,6 @@ public class PatientDetailsController implements Initializable {
                             stage.setScene(new Scene(root, 400, 200));
                             stage.initModality(Modality.APPLICATION_MODAL);
                             stage.showAndWait();
-                            stage.show();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -255,6 +252,8 @@ public class PatientDetailsController implements Initializable {
 
         this.events = FXCollections.observableArrayList(tempEvents);
         eventTable.setItems(events);
+
+        printObservations();
     }
 
     public void filtering(KeyEvent onKeyReleased) {
@@ -285,5 +284,14 @@ public class PatientDetailsController implements Initializable {
 
     public PatientDetailsController getPatientDetailsController(){
         return this;
+    }
+
+    public void printObservations(){
+        List<Observation> chartObservations = observations.stream().filter(x->x.getCode().getText().equals("Body Height")).collect(Collectors.toList());
+        int i=0;
+        for (Observation chartObservation : chartObservations) {
+            System.out.println(i+". "+chartObservation.getValueQuantity().getValue());
+            i++;
+        }
     }
 }

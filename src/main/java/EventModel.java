@@ -57,9 +57,14 @@ public class EventModel {
         if (observation.hasValueQuantity()) {
             this.value = observation.getValueQuantity().getValue().toString();
             this.unit = observation.getValueQuantity().getUnit();
-            this.valueunit=this.value+" "+this.unit;
         } else if (observation.hasValueCodeableConcept())
-            this.valueunit = observation.getValueCodeableConcept().getText();
+            this.value = observation.getValueCodeableConcept().getText();
+        updateValueunit();
+    }
+
+    public void setResource(Resource resource) {
+        resource.copyValues(this.resource);
+//        this.resource.copyValues(resource);
     }
 
     EventModel(Observation observation, Integer number) {
@@ -71,6 +76,8 @@ public class EventModel {
 
         Observation.ObservationComponentComponent component = observation.getComponent().get(number);
         this.event = component.getCode().getText();
+        this.value = component.getValueQuantity().getValue().toString();
+        this.unit = component.getValueQuantity().getUnit();
         this.valueunit = component.getValueQuantity().getValue() + " " + component.getValueQuantity().getUnit();
     }
 
@@ -81,6 +88,10 @@ public class EventModel {
 
     public String getDate() {
         return date;
+    }
+
+    public void updateValueunit() {
+        this.valueunit = this.value + (this.unit == null ? "" : " [" + this.unit + "]");
     }
 
     public String getType() {

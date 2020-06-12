@@ -1,4 +1,5 @@
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.util.BundleUtil;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
@@ -75,8 +76,9 @@ public class FhirHandler {
         return null;
     }
 
-    public static void updateObservation(Observation observation){
-        client.update().resource(observation).execute();
+    public static void updateObservation(Observation observation, EventEditController eventEditController) {
+        MethodOutcome methodOutcome = client.update().resource(observation).execute();
+        eventEditController.updateEventModel((Resource) methodOutcome.getResource());
     }
 
     public static Boolean hasPatients() {
