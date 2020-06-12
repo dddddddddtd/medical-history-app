@@ -226,7 +226,7 @@ public class PatientDetailsController implements Initializable {
         eventTable.setRowFactory( tv -> {
             TableRow<EventModel> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
                     EventModel rowData = row.getItem();
                     if(rowData.getType().matches("Observation")){
                         try {
@@ -243,7 +243,6 @@ public class PatientDetailsController implements Initializable {
                             stage.setScene(new Scene(root, 400, 200));
                             stage.initModality(Modality.APPLICATION_MODAL);
                             stage.showAndWait();
-                            stage.show();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
