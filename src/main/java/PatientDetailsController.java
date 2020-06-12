@@ -250,30 +250,6 @@ public class PatientDetailsController implements Initializable {
             return row;
         });
 
-//        eventTable.setOnMouseClicked(new EventHandler<MouseEvent>() {
-//            @Override
-//            public void handle(MouseEvent event) {
-//                if(event.getClickCount()==2){
-//                    try {
-//                        FXMLLoader loader = new FXMLLoader(getClass().getResource("./event_edit.fxml"));
-//                        Parent root = loader.load();
-//
-//                        EventEditController controller =
-//                                loader.<EventEditController>getController();
-//                        controller.setEventModel(eventTable.getSelectionModel().getSelectedItem());
-//                        controller.setPatientDetailsController(getPatientDetailsController());
-//
-//                        Stage stage = new Stage();
-//                        stage.setTitle("Event Editor");
-//                        stage.setScene(new Scene(root, 400, 200));
-//                        stage.show();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//        });
-
         this.events = FXCollections.observableArrayList(tempEvents);
         eventTable.setItems(events);
     }
