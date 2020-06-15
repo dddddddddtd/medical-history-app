@@ -5,6 +5,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Resource;
@@ -60,30 +61,33 @@ public class EventEditController {
 
     @FXML
     public void handleCloseButtonAction(ActionEvent event) {
-        eventModel.setDate(datePicker.getValue().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")));
-        eventModel.setValue(valueField.getText());
-        eventModel.updateValueunit();
-        patientDetailsController.refresh();
 
-        Observation observation = (Observation) eventModel.getResource();
-        observation.setIssued(Date.from(datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        try{
+            Observation observation = (Observation) eventModel.getResource();
+            observation.setIssued(Date.from(datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
+            if (observation.hasValueQuantity()){
+                observation.getValueQuantity().setValue(Float.parseFloat(valueField.getText()));
+            }
+            else if (observation.hasValueCodeableConcept()){
+                observation.getValueCodeableConcept().setText(valueField.getText());
+            }
 
-        //TODO updating date works, have to fix value
-        if (observation.hasValueQuantity()){
-            observation.getValueQuantity().setValue(Float.parseFloat(valueField.getText()));
+            FhirHandler.updateObservation(observation, this);
+
+//        patientDetailsController.printObservations();
+            eventModel.setDate(datePicker.getValue().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")));
+            eventModel.setValue(valueField.getText());
+            eventModel.updateValueunit();
+            patientDetailsController.refresh();
+            Stage stage = (Stage) saveButton.getScene().getWindow();
+            stage.close();
+        } catch (FHIRException e) {
+            e.printStackTrace();
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
         }
-        else if (observation.hasValueCodeableConcept()){
-            observation.getValueCodeableConcept().setText(valueField.getText());
-        }
 
-        FhirHandler.updateObservation(observation, this);
-
-
-        patientDetailsController.printObservations();
-        //TODO save current data to the server
-        Stage stage = (Stage) saveButton.getScene().getWindow();
-        stage.close();
     }
     public void setPatientDetailsController(PatientDetailsController patientDetailsController) {
         this.patientDetailsController = patientDetailsController;
